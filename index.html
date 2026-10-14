@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lamia's DU Dream Portal - Model Test Platform</title>
-  <!-- Confetti Celebration Library -->
+  <title>Lamia's DU Dream Portal - 100 Marks Model Test</title>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Data files loaded dynamically -->
+  <script src="exam_data.js"></script>
   <style>
     :root {
       --primary: #1e3a8a;
@@ -13,553 +14,274 @@
       --bg: #f8fafc;
       --card-bg: #ffffff;
       --border: #e2e8f0;
-      --text: #0f172a;
       --success: #16a34a;
       --danger: #dc2626;
       --warning: #d97706;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hind Siliguri", sans-serif; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 60px; }
+    body { background: var(--bg); color: #0f172a; padding-bottom: 60px; }
     
-    .navbar { background: var(--primary); color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .navbar h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.5px; }
-    .nav-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; margin-left: 8px; }
-    .nav-btn:hover { background: rgba(255,255,255,0.3); }
+    .navbar { background: var(--primary); color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    .navbar h1 { font-size: 1.1rem; font-weight: 700; }
+    .nav-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
 
     .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
 
-    .welcome-card { background: white; border-radius: 12px; padding: 22px; text-align: center; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.04); margin-bottom: 20px; }
-    .welcome-card h2 { color: var(--primary); margin-bottom: 8px; }
-    
-    .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; margin-top: 15px; }
-    .exam-card { background: white; border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; text-align: center; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .exam-card:hover { border-color: var(--accent); background: #eff6ff; transform: translateY(-2px); }
-    .exam-card h4 { color: var(--primary); font-size: 1rem; margin-bottom: 4px; }
-    .exam-card .badge { display: inline-block; font-size: 0.75rem; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
-    .start-btn { margin-top: 10px; width: 100%; padding: 8px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+    /* Home View */
+    .welcome-card { background: white; border-radius: 12px; padding: 22px; text-align: center; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+    .welcome-card h2 { color: var(--primary); margin-bottom: 6px; }
+    .exam-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+    .exam-card { background: white; border: 1.5px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; transition: 0.2s; }
+    .exam-card:hover { border-color: var(--accent); background: #eff6ff; }
+    .exam-card h4 { color: var(--primary); margin-bottom: 4px; }
+    .start-btn { margin-top: 10px; width: 100%; padding: 8px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
 
+    /* Exam View */
     #examView { display: none; }
-    .exam-header { background: white; padding: 12px 20px; border-radius: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; position: sticky; top: 60px; z-index: 90; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
+    .exam-header { background: white; padding: 12px 20px; border-radius: 10px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 60px; z-index: 90; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.03); }
     .timer { font-size: 1.25rem; font-weight: 800; color: var(--danger); background: #fee2e2; padding: 6px 16px; border-radius: 8px; }
 
-    .q-card { background: white; border-radius: 10px; padding: 18px; margin-bottom: 14px; border: 1px solid var(--border); }
-    .tag { display: inline-block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent); background: #eff6ff; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; }
-    .q-title { font-weight: 600; font-size: 1rem; margin-bottom: 12px; line-height: 1.5; }
-    .options-list { display: grid; gap: 8px; }
-    .opt-label { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; transition: 0.15s; font-size: 0.95rem; }
+    .q-card { background: white; border-radius: 10px; padding: 16px; margin-bottom: 14px; border: 1px solid var(--border); }
+    .tag { font-size: 0.75rem; font-weight: 700; color: var(--accent); background: #eff6ff; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; display: inline-block; }
+    .q-title { font-weight: 600; margin-bottom: 12px; font-size: 1rem; line-height: 1.5; }
+    .opt-label { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 6px; margin-bottom: 6px; cursor: pointer; font-size: 0.95rem; }
     .opt-label:hover { background: #f8fafc; }
     .opt-label input { width: 16px; height: 16px; cursor: pointer; }
 
-    .submit-exam-btn { width: 100%; padding: 15px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 15px; }
+    .submit-btn { width: 100%; padding: 16px; background: var(--success); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 15px; }
 
+    /* Result & Detailed Review */
     #resultView { display: none; background: white; border-radius: 12px; padding: 25px; text-align: center; border: 1px solid var(--border); }
-    .score-circle { font-size: 2.8rem; font-weight: 900; color: var(--primary); margin: 12px 0; }
-    .love-msg-box { padding: 16px; border-radius: 10px; font-size: 1.05rem; font-weight: 600; margin: 18px 0; line-height: 1.5; }
+    .score-circle { font-size: 3rem; font-weight: 900; color: var(--primary); margin: 12px 0; }
+    .msg-box { padding: 16px; border-radius: 10px; font-weight: 600; margin: 16px 0; line-height: 1.5; font-size: 1.05rem; }
     .msg-green { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
     .msg-yellow { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
     .msg-red { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
-    .summary-stats { display: flex; justify-content: space-around; margin: 20px 0; gap: 10px; }
-    .stat-pill { background: #f8fafc; border: 1px solid var(--border); padding: 10px; border-radius: 8px; flex: 1; font-weight: 700; }
+    .stat-row { display: flex; gap: 10px; margin: 15px 0; }
+    .stat-box { flex: 1; background: #f8fafc; border: 1px solid var(--border); padding: 10px; border-radius: 8px; font-weight: 700; }
 
-    .review-item { text-align: left; padding: 12px; border-radius: 8px; margin-top: 10px; font-size: 0.9rem; border: 1px solid #e2e8f0; }
-    .rev-correct { background: #f0fdf4; border-color: #86efac; }
-    .rev-wrong { background: #fef2f2; border-color: #fca5a5; }
-    .rev-skipped { background: #f8fafc; }
-
-    #adminModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; padding: 20px 10px; }
-    .modal-content { background: white; max-width: 680px; margin: 30px auto; border-radius: 12px; padding: 22px; }
-    .admin-textarea { width: 100%; height: 200px; font-family: monospace; font-size: 13px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; margin-top: 10px; }
-    .input-field { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; margin: 8px 0; font-size: 0.95rem; }
+    .review-item { text-align: left; padding: 14px; border-radius: 8px; margin-top: 10px; font-size: 0.95rem; }
+    .rev-c { background: #f0fdf4; border: 1px solid #86efac; }
+    .rev-w { background: #fef2f2; border: 1px solid #fca5a5; }
+    .rev-s { background: #f8fafc; border: 1px solid #cbd5e1; }
   </style>
 </head>
 <body>
 
-  <!-- Top Navbar -->
   <div class="navbar">
     <h1>🎓 DU B-Unit Mission: Lamia</h1>
-    <div>
-      <button class="nav-btn" onclick="goHome()">Dashboard</button>
-      <button class="nav-btn" onclick="openAdmin()">Husband Hub</button>
-    </div>
+    <button class="nav-btn" onclick="goHome()">Dashboard</button>
   </div>
 
   <div class="container">
-
-    <!-- HOME / EXAM LIST -->
+    <!-- DASHBOARD -->
     <div id="homeView">
       <div class="welcome-card">
         <h2>আসসালামু আলাইকুম, লামিয়া ❤️</h2>
-        <p>ঢাকা বিশ্ববিদ্যালয়সহ (DU, JnU, JU, CU) শীর্ষ পাবলিক বিশ্ববিদ্যালয়ের জন্য তোমার ২০টি মডেল টেস্ট প্রস্তুত।</p>
-        <p style="margin-top: 8px; font-size: 0.85rem; color: #64748b;">সময়: ৬০ মিনিট | ভুল উত্তরের জন্য -০.২৫ নেগেটিভ মার্কিং</p>
+        <p>ঢাকা বিশ্ববিদ্যালয় (DU B-Unit), জবি (JnU), জাবি (JU), এবং চবি (CU) ১০০ নম্বরের ২০টি পূর্ণাঙ্গ মডেল টেস্ট।</p>
+        <p style="margin-top: 6px; font-size: 0.85rem; color: #64748b;">সময়: ৬০ মিনিট | পূর্ণমান: ১০০ | ভুল উত্তরের জন্য -০.২৫ নেগেটিভ মার্কিং</p>
       </div>
 
-      <h3 style="margin-bottom: 10px;">Select Model Test:</h3>
+      <h3 style="margin-bottom: 12px;">মডেল টেস্ট নির্বাচন করো:</h3>
       <div class="exam-grid" id="examGrid"></div>
     </div>
 
-    <!-- EXAM TAKING VIEW -->
+    <!-- EXAM TEST SCREEN -->
     <div id="examView">
       <div class="exam-header">
         <div>
-          <strong id="activeExamTitle">Exam</strong>
-          <div style="font-size: 0.8rem; color: #64748b;">নেগেটিভ মার্কিং: -০.২৫</div>
+          <strong id="examTitle">Model Test</strong>
+          <div style="font-size: 0.8rem; color: #64748b;">১০০ প্রশ্ন • ৬০ মিনিট • নেগেটিভ মার্কিং: ০.২৫</div>
         </div>
         <div class="timer" id="timer">60:00</div>
       </div>
 
       <form id="questionsForm"></form>
-      <button class="submit-exam-btn" onclick="submitExam()">Finish & Submit Exam</button>
+      <button class="submit-btn" onclick="submitExam()">Finish & Submit Exam (100 Marks)</button>
     </div>
 
-    <!-- RESULT VIEW -->
+    <!-- DETAILED REVIEW AND SCORE SCREEN -->
     <div id="resultView">
       <h2>পরীক্ষার ফলাফল</h2>
-      <div class="score-circle" id="scoreDisplay">0.00</div>
-
-      <div id="loveMessage" class="love-msg-box"></div>
-
-      <div class="summary-stats">
-        <div class="stat-pill" style="color: var(--success);" id="statCorrect">সঠিক: 0</div>
-        <div class="stat-pill" style="color: var(--danger);" id="statWrong">ভুল: 0</div>
-        <div class="stat-pill" style="color: #64748b;" id="statSkipped">ছেড়ে দেওয়া: 0</div>
-      </div>
-
-      <div id="syncStatus" style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;"></div>
-
-      <button class="nav-btn" style="background: var(--primary); padding: 10px 20px; font-size: 1rem;" onclick="goHome()">Back to Dashboard</button>
-
-      <h3 style="text-align: left; margin-top: 30px; border-bottom: 2px solid var(--border); padding-bottom: 8px;">উত্তর পর্যালোচনা:</h3>
-      <div id="detailedReview"></div>
-    </div>
-
-  </div>
-
-  <!-- ADMIN HUB MODAL (Password: 1234) -->
-  <div id="adminModal">
-    <div class="modal-content">
-      <h2>🔒 Husband's Control Hub</h2>
-      <p style="font-size: 0.85rem; color: #64748b;">ঢাকা থেকে ২০টি মডেল টেস্ট ও Google Sheets কনফিগারেশন।</p>
+      <div class="score-circle" id="scoreDisplay">0.00 / 100</div>
+      <div id="loveMsg" class="msg-box"></div>
       
-      <label style="display: block; margin-top: 15px; font-weight: 600;">Google Apps Script URL:</label>
-      <input type="text" id="scriptUrlInput" class="input-field" placeholder="https://script.google.com/macros/s/.../exec">
-
-      <label style="display: block; margin-top: 10px; font-weight: 600;">মডেল টেস্ট নির্বাচন করুন:</label>
-      <select id="examSlotSelect" class="input-field" onchange="loadQuestionsIntoAdmin()"></select>
-
-      <label style="display: block; margin-top: 10px; font-weight: 600;">প্রশ্ন সম্পাদনা করুন:</label>
-      <textarea id="adminQuestionText" class="admin-textarea"></textarea>
-
-      <div style="display: flex; gap: 10px; margin-top: 15px;">
-        <button class="start-btn" style="background: var(--success); padding: 10px;" onclick="saveAdminQuestions()">Save Changes</button>
-        <button class="start-btn" style="background: #64748b; padding: 10px;" onclick="closeAdmin()">Close</button>
+      <div class="stat-row">
+        <div class="stat-box" style="color:var(--success);" id="statC">সঠিক: 0</div>
+        <div class="stat-box" style="color:var(--danger);" id="statW">ভুল: 0</div>
+        <div class="stat-box" style="color:#64748b;" id="statS">ছেড়ে দেওয়া: 0</div>
       </div>
+
+      <button class="nav-btn" style="background:var(--primary); padding:10px 20px; font-size:1rem;" onclick="goHome()">Back to Dashboard</button>
+
+      <h3 style="text-align:left; margin-top:30px; border-bottom:2px solid var(--border); padding-bottom:8px;">
+        উত্তর পর্যালোচনা (ভুল, সঠিক ও ছেড়ে দেওয়া প্রশ্নের সমাধান):
+      </h3>
+      <div id="reviewContainer"></div>
     </div>
   </div>
 
   <script>
-    const ADMIN_PASS = "1234";
-    const NEGATIVE_MARK = 0.25;
-    let currentExamId = 1;
-    let timerInterval = null;
-    let secondsLeft = 60 * 60;
-    let activeQuestions = [];
-
-    // Pre-loaded Questions for 20 Exams (Bangla, English, GK)
-    const baseBank = [
-      {
-        name: "DU B-Unit Special 01",
-        data: `Subject: Bangla
-Q: ‘অপরিচিতা’ গল্পে কল্যাণীর বাবার নাম কী?
-A) শম্ভুনাথ সেন
-B) হরিচরণ সেন
-C) বনমালী রায়
-D) অনুপম ঘোষ
-Ans: A
-
-Subject: English
-Q: Choose the correct synonym of 'Meticulous':
-A) Careless
-B) Thorough
-C) Hasty
-D) Arrogant
-Ans: B
-
-Subject: General Knowledge
-Q: ঢাকা বিশ্ববিদ্যালয়ের প্রথম উপাচার্য কে ছিলেন?
-A) স্যার পি জে হার্টগ
-B) রমেশচন্দ্র মজুমদার
-C) ড. মুহম্মদ শহীদুল্লাহ
-D) স্যার এ এফ রহমান
-Ans: A`
-      },
-      {
-        name: "DU B-Unit Special 02",
-        data: `Subject: Bangla
-Q: ‘বিলাসী’ গল্পটি কোন পত্রিকায় প্রথম প্রকাশিত হয়?
-A) সবুজপত্র
-B) ভারতী
-C) প্রবাসী
-D) বঙ্গদর্শন
-Ans: B
-
-Subject: English
-Q: Identify the correct spelling:
-A) Occurence
-B) Occurrence
-C) Ocurrence
-D) Ocurence
-Ans: B
-
-Subject: General Knowledge
-Q: বাংলাদেশের সংবিধানের কোন অনুচ্ছেদে বাক-স্বাধীনতা নিশ্চিত করা হয়েছে?
-A) ৩৯ অনুচ্ছেদ
-B) ২৭ অনুচ্ছেদ
-C) ৩২ অনুচ্ছেদ
-D) ৩৬ অনুচ্ছেদ
-Ans: A`
-      },
-      {
-        name: "Jagannath Univ (JnU) 03",
-        data: `Subject: Bangla
-Q: কাজী নজরুল ইসলামের ‘বিদ্রোহী’ কবিতাটি কোন কাব্যের অন্তর্গত?
-A) বিষের বাঁশী
-B) চক্রবাক
-C) অগ্নিবীণা
-D) সিন্ধু-হিন্দোল
-Ans: C
-
-Subject: English
-Q: Which one is an antonym of 'Fragile'?
-A) Delicate
-B) Sturdy
-C) Frail
-D) Slender
-Ans: B
-
-Subject: General Knowledge
-Q: জগন্নাথ বিশ্ববিদ্যালয় কত সালে পূর্ণাঙ্গ বিশ্ববিদ্যালয় হিসেবে প্রতিষ্ঠিত হয়?
-A) ২০০৩
-B) ২০০৫
-C) ২০০১
-D) ২০০৮
-Ans: B`
-      },
-      {
-        name: "Jahangirnagar (JU) 04",
-        data: `Subject: Bangla
-Q: ‘তাহারেই পড়ে মনে’ কবিতাটি কোন ছন্দে রচিত?
-A) মাত্রাবৃত্ত
-B) অক্ষরবৃত্ত
-C) স্বরবৃত্ত
-D) গদ্যছন্দ
-Ans: B
-
-Subject: English
-Q: 'Look into' means:
-A) To observe closely
-B) To investigate
-C) To admire
-D) To ignore
-Ans: B
-
-Subject: General Knowledge
-Q: জাহাঙ্গীরনগর বিশ্ববিদ্যালয়ের কেন্দ্রীয় শহিদ মিনারের স্থপতি কে?
-A) শামীম শিকদার
-B) রবিউল হুসাইন
-C) হামিদুর রহমান
-D) নভেরা আহমেদ
-Ans: B`
-      },
-      {
-        name: "Chittagong Univ (CU) 05",
-        data: `Subject: Bangla
-Q: ‘রক্তে রাঙানো একুশে ফেব্রুয়ারি’ গানের রচয়িতা কে?
-A) আলতাফ মাহমুদ
-B) আবদুল গাফফার চৌধুরী
-C) শামসুর রাহমান
-D) জহির রায়হান
-Ans: B
-
-Subject: English
-Q: He has no appetite ___ food.
-A) of
-B) with
-C) for
-D) in
-Ans: C
-
-Subject: General Knowledge
-Q: চট্টগ্রাম বিশ্ববিদ্যালয়ের আয়তন কত একর?
-A) ১৭৫৩ একর
-B) ১৬০০ একর
-C) ২৩০০ একর
-D) ১২৫০ একর
-Ans: A`
-      }
-    ];
-
-    // Build list up to 20 tests
-    const allExams = [];
-    for (let i = 1; i <= 20; i++) {
-      const template = baseBank[(i - 1) % baseBank.length];
-      allExams.push({
-        id: i,
-        name: `Model Test ${i < 10 ? '0' + i : i} (${template.name.split(' ')[0]})`,
-        data: template.data
-      });
-    }
+    let currentQuestions = [];
+    let currentExamNum = 1;
+    let timerInt = null;
+    let secLeft = 60 * 60;
 
     window.onload = function() {
-      // Setup Storage & UI
-      allExams.forEach(ex => {
-        if (!localStorage.getItem(`exam_${ex.id}`)) {
-          localStorage.setItem(`exam_${ex.id}`, ex.data);
-        }
-      });
-
-      renderExamGrid();
-      populateAdminSelect();
-    };
-
-    function renderExamGrid() {
       const grid = document.getElementById("examGrid");
       grid.innerHTML = "";
-      allExams.forEach(ex => {
-        const card = document.createElement("div");
-        card.className = "exam-card";
-        card.innerHTML = `
-          <h4>Test ${ex.id}</h4>
-          <span class="badge">${ex.name}</span>
-          <button class="start-btn" onclick="startExam(${ex.id})">Start Test</button>
+      for (let i = 1; i <= 20; i++) {
+        grid.innerHTML += `
+          <div class="exam-card">
+            <h4>Model Test ${i < 10 ? '0' + i : i}</h4>
+            <small style="color:#64748b;">১০০টি প্রশ্ন (পূর্ণাঙ্গ)</small>
+            <button class="start-btn" onclick="startTest(${i})">Start Exam</button>
+          </div>
         `;
-        grid.appendChild(card);
-      });
-    }
-
-    function populateAdminSelect() {
-      const sel = document.getElementById("examSlotSelect");
-      sel.innerHTML = "";
-      allExams.forEach(ex => {
-        const opt = document.createElement("option");
-        opt.value = ex.id;
-        opt.innerText = `Test ${ex.id}: ${ex.name}`;
-        sel.appendChild(opt);
-      });
-    }
-
-    function parseRawQuestions(raw) {
-      if (!raw || !raw.trim()) return [];
-      const blocks = raw.trim().split(/\n\s*\n/);
-      const parsed = [];
-
-      blocks.forEach((block, idx) => {
-        const lines = block.split("\n").map(l => l.trim()).filter(l => l.length > 0);
-        let subject = "General";
-        let question = "";
-        let options = [];
-        let answer = "";
-
-        lines.forEach(line => {
-          if (/^subject:/i.test(line)) subject = line.replace(/^subject:/i, "").trim();
-          else if (/^q:/i.test(line)) question = line.replace(/^q:/i, "").trim();
-          else if (/^[A-D]\)/i.test(line)) options.push(line);
-          else if (/^ans:/i.test(line)) answer = line.replace(/^ans:/i, "").trim().toUpperCase();
-        });
-
-        if (question && options.length > 0 && answer) {
-          parsed.push({ id: idx, subject, question, options, answer });
-        }
-      });
-      return parsed;
-    }
+      }
+    };
 
     function goHome() {
-      clearInterval(timerInterval);
+      clearInterval(timerInt);
       document.getElementById("homeView").style.display = "block";
       document.getElementById("examView").style.display = "none";
       document.getElementById("resultView").style.display = "none";
     }
 
-    function startExam(id) {
-      currentExamId = id;
-      const raw = localStorage.getItem(`exam_${id}`) || "";
-      activeQuestions = parseRawQuestions(raw);
-
-      if (activeQuestions.length === 0) {
-        alert("এই পরীক্ষায় এখনো কোনো প্রশ্ন যোগ করা হয়নি!");
+    function startTest(num) {
+      currentExamNum = num;
+      // Pulls the exact 100 questions for this exam number
+      if (typeof getExamQuestions !== "function") {
+        alert("exam_data.js ফাইলটি পাওয়া যায়নি! দয়া করে ফাইলটি যুক্ত করুন।");
         return;
       }
+      currentQuestions = getExamQuestions(num);
 
-      document.getElementById("activeExamTitle").innerText = `Model Test ${id}`;
+      document.getElementById("examTitle").innerText = `Model Test ${num < 10 ? '0' + num : num}`;
       const form = document.getElementById("questionsForm");
       form.innerHTML = "";
 
-      activeQuestions.forEach((q, idx) => {
-        const card = document.createElement("div");
-        card.className = "q-card";
-        card.innerHTML = `
-          <span class="tag">${q.subject}</span>
-          <div class="q-title">${idx + 1}. ${q.question}</div>
-          <div class="options-list">
-            ${q.options.map(opt => {
-              const letter = opt.charAt(0).toUpperCase();
-              return `
-                <label class="opt-label">
-                  <input type="radio" name="q_${idx}" value="${letter}">
-                  <span>${opt}</span>
-                </label>
-              `;
-            }).join("")}
+      currentQuestions.forEach((q, idx) => {
+        const letters = ["A", "B", "C", "D"];
+        form.innerHTML += `
+          <div class="q-card">
+            <span class="tag">${q.s}</span>
+            <div class="q-title">${idx + 1}. ${q.q}</div>
+            ${q.o.map((opt, oIdx) => `
+              <label class="opt-label">
+                <input type="radio" name="q_${idx}" value="${letters[oIdx]}">
+                <span>${letters[oIdx]})${opt}</span>
+              </label>
+            `).join("")}
           </div>
         `;
-        form.appendChild(card);
       });
 
       document.getElementById("homeView").style.display = "none";
       document.getElementById("resultView").style.display = "none";
       document.getElementById("examView").style.display = "block";
-
       window.scrollTo(0, 0);
-      runTimer();
-    }
 
-    function runTimer() {
-      clearInterval(timerInterval);
-      secondsLeft = 60 * 60;
-      const timerElem = document.getElementById("timer");
-
-      timerInterval = setInterval(() => {
-        secondsLeft--;
-        let m = Math.floor(secondsLeft / 60);
-        let s = secondsLeft % 60;
-        timerElem.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-
-        if (secondsLeft <= 0) {
-          clearInterval(timerInterval);
-          alert("সময় শেষ! স্বয়ংক্রিয়ভাবে জমা নেওয়া হচ্ছে।");
+      secLeft = 60 * 60;
+      clearInterval(timerInt);
+      timerInt = setInterval(() => {
+        secLeft--;
+        let m = Math.floor(secLeft / 60);
+        let s = secLeft % 60;
+        document.getElementById("timer").innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        if (secLeft <= 0) {
+          clearInterval(timerInt);
+          alert("সময় শেষ! পরীক্ষা স্বয়ংক্রিয়ভাবে সাবমিট হয়ে যাচ্ছে।");
           submitExam();
         }
       }, 1000);
     }
 
     function submitExam() {
-      clearInterval(timerInterval);
+      clearInterval(timerInt);
       let correct = 0;
       let wrong = 0;
       let skipped = 0;
-      let reviewHTML = "";
+      let revHTML = "";
 
-      activeQuestions.forEach((q, idx) => {
-        const selected = document.querySelector(`input[name="q_${idx}"]:checked`);
-        if (!selected) {
+      currentQuestions.forEach((q, idx) => {
+        const sel = document.querySelector(`input[name="q_${idx}"]:checked`);
+        if (!sel) {
           skipped++;
-          reviewHTML += `
-            <div class="review-item rev-skipped">
-              <strong>${idx + 1}. [${q.subject}] ${q.question}</strong><br>
-              <span style="color: #64748b;">ছেড়ে দেওয়া হয়েছে।</span> | সঠিক উত্তর: <strong>${q.answer}</strong>
+          revHTML += `
+            <div class="review-item rev-s">
+              <strong>${idx + 1}. [${q.s}] ${q.q}</strong><br>
+              <span style="color:#64748b;">⚠️ তুমি এটি ছেড়ে দিয়েছো।</span> | সঠিক উত্তর: <strong style="color:var(--success);">${q.a}) ${getOptionText(q, q.a)}</strong>
             </div>
           `;
-        } else if (selected.value === q.answer) {
+        } else if (sel.value === q.a) {
           correct++;
-          reviewHTML += `
-            <div class="review-item rev-correct">
-              <strong>${idx + 1}. [${q.subject}] ${q.question}</strong><br>
-              <span style="color: var(--success);">সঠিক উত্তর! (+1.0)</span> | তোমার উত্তর: ${selected.value}
+          revHTML += `
+            <div class="review-item rev-c">
+              <strong>${idx + 1}. [${q.s}] ${q.q}</strong><br>
+              <span style="color:var(--success);">✅ সঠিক উত্তর! (+1.0)</span> | তোমার উত্তর: <strong>${sel.value}) ${getOptionText(q, sel.value)}</strong>
             </div>
           `;
         } else {
           wrong++;
-          reviewHTML += `
-            <div class="review-item rev-wrong">
-              <strong>${idx + 1}. [${q.subject}] ${q.question}</strong><br>
-              <span style="color: var(--danger);">ভুল উত্তর (-0.25)</span> | তোমার উত্তর ছিল: <strong>${selected.value}</strong> | সঠিক উত্তর: <strong>${q.answer}</strong>
+          revHTML += `
+            <div class="review-item rev-w">
+              <strong>${idx + 1}. [${q.s}] ${q.q}</strong><br>
+              <span style="color:var(--danger);">❌ ভুল উত্তর (-0.25)</span> | তোমার উত্তর ছিল: <strong>${sel.value}) ${getOptionText(q, sel.value)}</strong> <br>
+              👉 সঠিক উত্তর: <strong style="color:var(--success);">${q.a}) ${getOptionText(q, q.a)}</strong>
             </div>
           `;
         }
       });
 
-      const totalQuestions = activeQuestions.length;
-      const score = (correct * 1.0) - (wrong * NEGATIVE_MARK);
-      const percentage = (score / totalQuestions) * 100;
+      function getOptionText(q, letter) {
+        const map = { "A": 0, "B": 1, "C": 2, "D": 3 };
+        return q.o[map[letter]] || letter;
+      }
 
-      const loveBox = document.getElementById("loveMessage");
-      if (percentage >= 60) {
-        confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-        loveBox.className = "love-msg-box msg-green";
-        loveBox.innerHTML = `🎉 মাশাআল্লাহ লামিয়া! অসাধারণ করেছো! <br> তুমি ৬০% এর বেশি মার্ক পেয়েছো (${score.toFixed(2)} / ${totalQuestions})। ঢাকা বিশ্ববিদ্যালয়ের সবুজ চত্বর তোমার জন্যই অপেক্ষা করছে! ❤️`;
-      } else if (percentage >= 40) {
-        loveBox.className = "love-msg-box msg-yellow";
-        loveBox.innerHTML = `👏 অভিনন্দন লামিয়া! তুমি ভালো করেছো (${score.toFixed(2)} / ${totalQuestions})। তবে চান্স নিশ্চিত করতে আমাদের আরেকটু বেশি প্র্যাকটিস করতে হবে। তুমি পারবে, লেগে থাকো! 💪`;
+      const total = currentQuestions.length;
+      const score = (correct * 1.0) - (wrong * 0.25);
+      const loveBox = document.getElementById("loveMsg");
+
+      if (score >= 60) {
+        confetti({ particleCount: 160, spread: 80, origin: { y: 0.6 } });
+        loveBox.className = "msg-box msg-green";
+        loveBox.innerHTML = `🎉 মাশাআল্লাহ লামিয়া! ১০০ এর মধ্যে <strong>${score.toFixed(2)}</strong> পেয়েছো!<br>অসাধারণ প্রস্তুতি! তোমার এই মেহনত বৃথা যাবে না, ঢাকা বিশ্ববিদ্যালয়ের সবুজ চত্বর তোমার জন্যই অপেক্ষা করছে! ❤️`;
+      } else if (score >= 40) {
+        loveBox.className = "msg-box msg-yellow";
+        loveBox.innerHTML = `👏 অভিনন্দন লামিয়া! তুমি <strong>${score.toFixed(2)}</strong> পেয়েছো।<br>তুমি খুব কাছাকাছি আছো! নিচের যে প্রশ্নগুলো ভুল হয়েছে সেগুলো এখনই খাতায় নোট করে নাও। আরেকটু প্র্যাকটিস করলেই চান্স নিশ্চিত! 💪`;
       } else {
-        loveBox.className = "love-msg-box msg-red";
-        loveBox.innerHTML = `❤️ মন একটুও খারাপ করবে না লামিয়া! প্রতিটা ভুলই শেখার নতুন সুযোগ। পড়ালেখা আরো একটু বাড়াতে হবে, আত্মবিশ্বাস রাখো। আমি সব সময় তোমার পাশে আছি, সব ভালোবাসা তোমার জন্য। একসাথে আমরা ঢাকা বিশ্ববিদ্যালয় জয় করবই! ইনশাআল্লাহ। 🤍`;
+        loveBox.className = "msg-box msg-red";
+        loveBox.innerHTML = `❤️ মন একদম খারাপ করবে না লামিয়া! প্রতিটা ভুল থেকেই নতুন কিছু শেখা যায়।<br>পড়ালেখা আরেকটু বাড়াতে হবে, আত্মবিশ্বাস রাখো। আমি সব সময় তোমার পাশে আছি, সব ভালোবাসা তোমার জন্য। একসাথে আমরা ঢাকা বিশ্ববিদ্যালয় জয় করবই! ইনশাআল্লাহ। 🤍`;
       }
 
       document.getElementById("examView").style.display = "none";
       document.getElementById("resultView").style.display = "block";
-      document.getElementById("scoreDisplay").innerText = `${score.toFixed(2)} / ${totalQuestions}`;
-      document.getElementById("statCorrect").innerText = `সঠিক: ${correct}`;
-      document.getElementById("statWrong").innerText = `ভুল: ${wrong}`;
-      document.getElementById("statSkipped").innerText = `ছেড়ে দেওয়া: ${skipped}`;
-      document.getElementById("detailedReview").innerHTML = reviewHTML;
-
+      document.getElementById("scoreDisplay").innerText = `${score.toFixed(2)} / ${total}`;
+      document.getElementById("statC").innerText = `সঠিক: ${correct}`;
+      document.getElementById("statW").innerText = `ভুল: ${wrong}`;
+      document.getElementById("statS").innerText = `ছেড়ে দেওয়া: ${skipped}`;
+      document.getElementById("reviewContainer").innerHTML = revHTML;
       window.scrollTo(0, 0);
 
+      // Google Sheet Sync
       const scriptUrl = localStorage.getItem("hub_script_url");
-      const syncStatus = document.getElementById("syncStatus");
       if (scriptUrl) {
-        syncStatus.innerText = "ফলাফল স্বয়ংক্রিয়ভাবে Google Sheets-এ পাঠানো হচ্ছে...";
         fetch(scriptUrl, {
           method: "POST",
           mode: "no-cors",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            examName: `Model Test ${currentExamId}`,
+            examName: `Model Test ${currentExamNum}`,
             score: score.toFixed(2),
-            total: totalQuestions,
+            total: total,
             correct: correct,
             wrong: wrong,
             skipped: skipped
           })
-        }).then(() => {
-          syncStatus.innerText = "✅ তোমার ফলাফল জুবায়েরের কাছে পৌঁছে গেছে!";
-        }).catch(() => {
-          syncStatus.innerText = "ফল সংরক্ষণে নেটওয়ার্ক সমস্যা হয়েছে।";
         });
       }
-    }
-
-    function openAdmin() {
-      const p = prompt("Enter Husband Hub Password:");
-      if (p === ADMIN_PASS) {
-        document.getElementById("scriptUrlInput").value = localStorage.getItem("hub_script_url") || "";
-        loadQuestionsIntoAdmin();
-        document.getElementById("adminModal").style.display = "block";
-      } else if (p !== null) {
-        alert("ভুল পাসওয়ার্ড!");
-      }
-    }
-
-    function closeAdmin() {
-      document.getElementById("adminModal").style.display = "none";
-    }
-
-    function loadQuestionsIntoAdmin() {
-      const slot = document.getElementById("examSlotSelect").value;
-      document.getElementById("adminQuestionText").value = localStorage.getItem(`exam_${slot}`) || "";
-    }
-
-    function saveAdminQuestions() {
-      const slot = document.getElementById("examSlotSelect").value;
-      const text = document.getElementById("adminQuestionText").value;
-      const scriptUrl = document.getElementById("scriptUrlInput").value.trim();
-
-      localStorage.setItem(`exam_${slot}`, text);
-      if (scriptUrl) localStorage.setItem("hub_script_url", scriptUrl);
-
-      alert(`Model Test ${slot} আপডেট সম্পন্ন হয়েছে!`);
-      closeAdmin();
     }
   </script>
 </body>
